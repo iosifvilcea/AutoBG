@@ -2,9 +2,9 @@ from __future__ import print_function
 import re, praw, requests, os, glob, sys
 from bs4 import BeautifulSoup
 
-#url = "https://i.imgur.com/Q6FfWwZ.png"
-i = 0
-
+# ****************************************************
+#   Get Top
+# ****************************************************
 def get_top():
     r = praw.Reddit(user_agent="iv-Scrape v0.0")
     submissions = r.get_subreddit(sys.argv[1]).get_top(limit=5)
@@ -31,7 +31,11 @@ def get_top():
         else:
             print("wut? ", submission.url)
 
-
+# ****************************************************
+#   Download Image
+#    param: ImageUrl - image link
+#           fileName - name of file to be saved
+# ****************************************************
 def downloadImage(imageUrl , fileName):
     response = requests.get(imageUrl, stream=True)
     
@@ -41,14 +45,19 @@ def downloadImage(imageUrl , fileName):
             for chunk in response.iter_content(4096):
                 fd.write(chunk)
 
+
+# ****************************************************
+#   Main
+# ****************************************************
 if __name__ == "__main__":
     
     MIN_SCORE = 100
     if len(sys.argv) < 2:
-        print("Usage: python scrape.py 'subreddit' ")
+        print("Usage: python scrape.py [subreddit] ")
         sys.exit()
     elif len(sys.argv) > 2:
         print('Error: Too many arguments.')
         sys.exit()
 
+    #Download top reddit posts.
     get_top()
