@@ -11,27 +11,32 @@ def get_top():
 
     for submission in submissions:
         
-        if "imgur.com" not in submission.url:
-                continue
-        elif 'http://i.imgur.com/' in submission.url:
-            fileName = submission.url
-            if '?' in fileName:
-                fileName = fileName[:fileName.find('?')]
+        if 'http://i.imgur.com/' in submission.url:
+            imageUrl = submission.url
+            
+            #Gets rid of the ?1 some imgur links have.
+            if '?' in imageUrl:
+                imageUrl = imageUrl[:imageUrl.find('?')]
+          
+            #Get image id and extension.
+            # Set it as fileName.
+            fileName = imageUrl.split('/')
+            downloadImage(imageUrl , fileName[3])
 
-            print("finna get ", fileName)
-
-            downloadImage(fileName)
+        #If its just a direct image link, just download it.
+        elif '.png' or '.jpeg' or '.jpg' in submission.url:
+            fileName = imageUrl.split('/')
+            downloadImage(imageUrl, fileName[3])
 
         else:
             print("wut? ", submission.url)
 
 
-def downloadImage(imageUrl):
+def downloadImage(imageUrl , fileName):
     response = requests.get(imageUrl, stream=True)
     
     if response.status_code == 200:
         print('Downloading ', imageUrl, ' ...')
-        fileName = "filename.jpg" 
         with open(fileName, 'wb') as fd:
             for chunk in response.iter_content(4096):
                 fd.write(chunk)
@@ -47,4 +52,3 @@ if __name__ == "__main__":
         sys.exit()
 
     get_top()
-    #printSoup()
