@@ -1,6 +1,7 @@
 from __future__ import print_function
-import re, praw, requests, os, glob, sys
 from bs4 import BeautifulSoup
+
+import re, praw, requests, os, glob, sys
 
 # ****************************************************
 #   Get Top
@@ -10,7 +11,7 @@ def get_top():
     submissions = r.get_subreddit(sys.argv[1]).get_top(limit=5)
 
     for submission in submissions:
-        
+
         if 'http://i.imgur.com/' in submission.url:
             imageUrl = submission.url
             
@@ -23,13 +24,13 @@ def get_top():
             fileName = imageUrl.split('/')
             downloadImage(imageUrl , fileName[3])
 
-        #If its just a direct image link, just download it.
+        #If its a direct image link, download it.
         elif '.png' or '.jpeg' or '.jpg' in submission.url:
             fileName = imageUrl.split('/')
             downloadImage(imageUrl, fileName[3])
 
         else:
-            print("wut? ", submission.url)
+            print("Link Error: ", submission.url)
 
 # ****************************************************
 #   Download Image
@@ -38,13 +39,16 @@ def get_top():
 # ****************************************************
 def downloadImage(imageUrl , fileName):
     response = requests.get(imageUrl, stream=True)
+  
+    #Create directory path
+    path = '/home/iv11/Pictures/wallpaper/'
+    fileName = os.path.join(path, fileName)
     
-    if response.status_code == 200:
+    if response.status_code == requests.codes.ok:
         print('Downloading ', imageUrl, ' ...')
         with open(fileName, 'wb') as fd:
             for chunk in response.iter_content(4096):
                 fd.write(chunk)
-
 
 # ****************************************************
 #   Main
